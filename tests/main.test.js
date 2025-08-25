@@ -85,3 +85,24 @@ it('Gameboard receiveAttack method records a miss', () => {
     game.receiveAttack(attackCords);
     expect(misses).toContainEqual([3, 2]);
 });
+
+it('Gameboard reports if all ships are sunk', () => {
+    const game = new Gameboard();
+    const cords = [1, 3, 2, false];
+    const ship = game.placeShip(cords);
+    const attackCords = [3, 2];
+    game.receiveAttack(attackCords);
+    expect(game.allShipsSunk()).toBeTruthy();
+});
+
+
+
+it('Gameboard reports if not all ships are sunk', () => {
+    const game = new Gameboard();
+    const cords = [1, 3, 2, false];
+    const ship = game.placeShip(cords);
+    const attackCords = [3, 3];
+    game.receiveAttack(attackCords);
+    expect(game.allShipsSunk()).toBeFalsy();
+});
+
