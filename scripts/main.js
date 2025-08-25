@@ -101,3 +101,10 @@ export class Gameboard {
         return this.activeShips.length === 0;
     }
 }
+
+export class Player {
+    constructor(player) {
+        this.player = player;
+        let gameBoard = new Gameboard();
+    }
+}
