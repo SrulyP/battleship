@@ -1,4 +1,4 @@
-import Ship from '../src/scripts/main';
+import { Ship, Gameboard } from '../src/scripts/main';
 
 it('Ship has a length', () => {
     const ship = new Ship(3);
@@ -26,3 +26,7 @@ it('Ship isSunk method correctly evaluates if ship is sunk', () => {
     expect(ship.isSunk()).toBe(true);
 });
 
+it('Gameboard is set up', () => {
+    const game = new Gameboard();
+    expect(game.board[0][0]).toBe(0);
+});
