@@ -30,3 +30,10 @@ it('Gameboard is set up', () => {
     const game = new Gameboard();
     expect(game.board[0][0]).toBe(0);
 });
+
+it('Gameboard can place ships at specific coordinates by calling the ship class.', () => {
+    const game = new Gameboard();
+    const cords = [2, 2, 3, true]; // length, x, y, horizontal
+    const ship = new Ship(cords[0]);
+    expect(game.placeShip(cords)).toEqual(ship);
+});
