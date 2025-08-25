@@ -30,4 +30,52 @@ export class Gameboard {
             this.board.push(rowArray);
         }
     }
+    getBoard() {
+        return this.board;
+    }
+
+    placeShip(cords) {
+        const [length, x, y, horizontal] = cords;
+        const ship = new Ship(length);
+        const board = this.getBoard();
+        this.checkBounds(cords);
+        if (horizontal) {
+            for (let i = 0; i < length; i++) {
+                board[x][y + i] = ship;
+            }
+        } else {
+            for (let i = 0; i < length; i++) {
+                board[x + i][y] = ship;
+            }
+        }
+        return ship;
+    }
+
+    checkBounds(cords) {
+        const board = this.getBoard();
+        const [length, x, y, horizontal] = cords;
+        if (x < 0 || x >= 10 || y < 0 || y >= 10) {
+            throw new Error('Out of bounds');
+        }
+        if (horizontal && y + length >= 10) {
+            throw new Error('Ship goes out of horizontal bounds');
+        }
+        if (!horizontal && x + length >= 10) {
+            throw new Error('Ship goes out of vertical bounds');
+        }
+        if (horizontal) {
+            for (let i = 0; i < length; i++) {
+                if (board[x][y + i] !== 0) {
+                    throw new Error('Space not empty');
+                }
+            }
+        }
+        if (!horizontal) {
+            for (let i = 0; i < length; i++) {
+                if (board[x + i][y] !== 0) {
+                    throw new Error('Space not empty');
+                }
+            }
+        }
+    }
 }
