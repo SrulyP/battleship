@@ -14,3 +14,15 @@ it('Ship can be sunk', () => {
     const ship = new Ship(3, 3, true);
     expect(ship.sunk).toBe(true);
 });
+
+it('Ship hit method increases ship hits amount', () => {
+    const ship = new Ship(3, 1, false);
+    ship.hit();
+    expect(ship.hitsAmount).toBe(2);
+});
+
+it('Ship isSunk method correctly evaluates if ship is sunk', () => {
+    const ship = new Ship(3, 3, true);
+    expect(ship.isSunk()).toBe(true);
+});
+
