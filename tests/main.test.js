@@ -68,3 +68,20 @@ it('Gameboard cannot place ships out of horizontal bounds.', () => {
         'Ship goes out of horizontal bounds'
     );
 });
+
+it('Gameboard receiveAttack method increases the hits of a ship', () => {
+    const game = new Gameboard();
+    const cords = [3, 3, 3, true];
+    const ship = game.placeShip(cords);
+    const attackCords = [3, 3];
+    game.receiveAttack(attackCords);
+    expect(ship.hitsAmount).toEqual('1');
+});
+
+it('Gameboard receiveAttack method records a miss', () => {
+    const game = new Gameboard();
+    const attackCords = [3, 2];
+    const misses = game.misses;
+    game.receiveAttack(attackCords);
+    expect(misses).toContain([3, 2]);
+});
