@@ -4,6 +4,12 @@ class Ship {
         this.hitsAmount = hitsAmount;
         this.sunk = sunk;
     }
+    hit() {
+        this.hitsAmount++;
+    }
+    isSunk() {
+        return this.hitsAmount === this.length;
+    }
 }
 
 export default Ship;
