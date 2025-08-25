@@ -20,6 +20,7 @@ export class Gameboard {
         this.board = [];
         this.setupBoard();
         this.misses = [];
+        this.activeShips = [];
     }
 
     setupBoard() {
@@ -49,6 +50,7 @@ export class Gameboard {
                 board[x + i][y] = ship;
             }
         }
+        this.activeShips.push(ship);
         return ship;
     }
 
@@ -88,6 +90,14 @@ export class Gameboard {
         } else {
             let ship = board[x][y];
             ship.hit();
+            if (ship.isSunk()) {
+                const index = this.activeShips.indexOf(ship);
+                this.activeShips.splice(index, 1);
+            }
         }
+    }
+
+    allShipsSunk() {
+        return this.activeShips.length === 0;
     }
 }
