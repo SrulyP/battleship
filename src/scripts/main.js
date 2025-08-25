@@ -19,6 +19,7 @@ export class Gameboard {
     constructor() {
         this.board = [];
         this.setupBoard();
+        this.misses = [];
     }
 
     setupBoard() {
@@ -76,6 +77,17 @@ export class Gameboard {
                     throw new Error('Space not empty');
                 }
             }
+        }
+    }
+
+    receiveAttack(attackCords) {
+        const board = this.getBoard();
+        const [x, y] = attackCords;
+        if (board[x][y] === 0) {
+            this.misses.push(attackCords);
+        } else {
+            let ship = board[x][y];
+            ship.hit();
         }
     }
 }
