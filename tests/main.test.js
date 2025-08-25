@@ -37,3 +37,21 @@ it('Gameboard can place ships at specific coordinates by calling the ship class.
     const ship = new Ship(cords[0]);
     expect(game.placeShip(cords)).toEqual(ship);
 });
+
+it('Gameboard cannot place ships out of bounds.', () => {
+    const game = new Gameboard();
+    const cords = [2, 10, 11, true]; // length, x, y, horizontal
+    expect(() => game.placeShip(cords)).toThrow('Out of bounds');
+});
+
+it('Gameboard cannot place ships out of vertical bounds.', () => {
+    const game = new Gameboard();
+    const cords = [3, 9, 9, false]; // length, x, y, horizontal
+    expect(() => game.placeShip(cords)).toThrow('Ship goes out of vertical bounds');
+});
+
+it('Gameboard cannot place ships out of horizontal bounds.', () => {
+    const game = new Gameboard();
+    const cords = [3, 9, 9, true]; // length, x, y, horizontal
+    expect(() => game.placeShip(cords)).toThrow('Ship goes out of horizontal bounds');
+});
