@@ -75,7 +75,7 @@ it('Gameboard receiveAttack method increases the hits of a ship', () => {
     const ship = game.placeShip(cords);
     const attackCords = [3, 3];
     game.receiveAttack(attackCords);
-    expect(ship.hitsAmount).toEqual('1');
+    expect(ship.hitsAmount).toEqual(1);
 });
 
 it('Gameboard receiveAttack method records a miss', () => {
@@ -83,5 +83,5 @@ it('Gameboard receiveAttack method records a miss', () => {
     const attackCords = [3, 2];
     const misses = game.misses;
     game.receiveAttack(attackCords);
-    expect(misses).toContain([3, 2]);
+    expect(misses).toContainEqual([3, 2]);
 });
