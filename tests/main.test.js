@@ -1,4 +1,4 @@
-import { Ship, Gameboard } from '../src/scripts/main';
+import { Ship, Gameboard, Player } from '../src/scripts/classes';
 
 it('Ship has a length', () => {
     const ship = new Ship(3);
@@ -45,6 +45,15 @@ it('Gameboard can place ships at specific coordinates.', () => {
     const ship = new Ship(cords[0]);
     game.placeShip(cords);
     expect(board[2][3]).toEqual(ship);
+});
+
+it('Gameboard places correct ship length on board.', () => {
+    const game = new Gameboard();
+    const board = game.getBoard();
+    const cords = [2, 2, 3, true]; // length, x, y, horizontal
+    const ship = new Ship(cords[0]);
+    game.placeShip(cords);
+    expect(board[2][4]).toEqual(ship);
 });
 
 it('Gameboard cannot place ships out of bounds.', () => {
@@ -95,8 +104,6 @@ it('Gameboard reports if all ships are sunk', () => {
     expect(game.allShipsSunk()).toBeTruthy();
 });
 
-
-
 it('Gameboard reports if not all ships are sunk', () => {
     const game = new Gameboard();
     const cords = [1, 3, 2, false];
@@ -105,4 +112,3 @@ it('Gameboard reports if not all ships are sunk', () => {
     game.receiveAttack(attackCords);
     expect(game.allShipsSunk()).toBeFalsy();
 });
-
