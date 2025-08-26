@@ -21,6 +21,7 @@ export class Gameboard {
         this.setupBoard();
         this.misses = [];
         this.activeShips = [];
+        this.shots = [];
     }
 
     setupBoard() {
@@ -85,6 +86,10 @@ export class Gameboard {
 
     receiveAttack(attackCords) {
         const board = this.getBoard();
+        if (this.duplicateHits(attackCords)) {
+            throw new Error('Cannot attack same cords twice');
+        }
+        this.shots.push(attackCords);
         const [x, y] = attackCords;
         if (board[x][y] === 0) {
             this.misses.push(attackCords);
@@ -96,6 +101,18 @@ export class Gameboard {
                 this.activeShips.splice(index, 1);
             }
         }
+    }
+
+    duplicateHits(attackCords) {
+        const [x, y] = attackCords;
+
+        for (let i = 0; i < this.shots.length; i++) {
+            const coord = this.shots[i];
+            if (coord[0] === x && coord[1] === y) {
+                return true;
+            }
+        }
+        return false;
     }
 
     allShipsSunk() {
