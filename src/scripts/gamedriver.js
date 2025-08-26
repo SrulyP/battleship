@@ -22,19 +22,14 @@ const gameApp = {
     init() {
         this.cache();
         this.bind();
-        this.render();
-
         this.player = new Player('You');
         this.pc = new Player('Computer');
+        this.render();
     },
 
     render() {
-        if (this.state === 'setup') {
-            this.renderPlayerSetupGrid();
-        } else if (this.state === 'playing') {
-            this.renderPlayerGrid();
-            this.renderPCGrid();
-        }
+        this.renderPlayerGrid();
+        this.renderPCGrid();
     },
 
     startGame() {
@@ -53,44 +48,38 @@ const gameApp = {
         this.render();
     },
 
-    renderPlayerSetupGrid() {
-        for (let row = 0; row < 10; row++) {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'player-grid-setup-row';
-
-            for (let col = 0; col < 10; col++) {
-                const colDiv = document.createElement('div');
-                colDiv.className = 'player-grid-setup-col';
-                colDiv.dataset.x = col;
-                colDiv.dataset.y = row;
-                rowDiv.appendChild(colDiv);
-            }
-            this.playerGridSetup.appendChild(rowDiv);
-        }
-        this.bindPlayerGrid();
+    renderPlayerGrid() {
+        this.renderGrid(
+            this.player,
+            this.playerGrid,
+            'player-grid-row',
+            'player-grid-col'
+        );
     },
 
-    renderPlayerGrid() {
-        const board = this.player.gameBoard;
-        const grid = this.playerGrid;
+    renderPCGrid() {
+        this.renderGrid(this.pc, this.pcGrid, 'pc-grid-row', 'pc-grid-col');
+    },
+
+    renderGrid(player, grid, rowClass, colClass) {
         grid.innerHTML = '';
 
         for (let y = 0; y < 10; y++) {
             const rowDiv = document.createElement('div');
-            rowDiv.className = 'player-grid-row';
+            rowDiv.className = rowClass;
 
             for (let x = 0; x < 10; x++) {
                 const colDiv = document.createElement('div');
-                colDiv.className = 'player-grid-col';
+                colDiv.className = colClass;
                 colDiv.dataset.x = x;
                 colDiv.dataset.y = y;
 
-                const tag = this.checkCellData(this.player, x, y);
+                const tag = this.checkCellData(player, x, y);
                 colDiv.textContent = tag;
 
                 rowDiv.appendChild(colDiv);
             }
-            this.playerGrid.appendChild(rowDiv);
+            grid.appendChild(rowDiv);
         }
     },
 
@@ -125,30 +114,6 @@ const gameApp = {
         if (isMiss || (wasShot && !hasShip)) return 'm';
         if (hasShip && player.name !== 'Computer') return 's';
         return '-';
-    },
-
-    renderPCGrid() {
-        const board = this.pc.gameBoard;
-        const grid = this.pcGrid;
-        grid.innerHTML = '';
-
-        for (let y = 0; y < 10; y++) {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'pc-grid-row';
-
-            for (let x = 0; x < 10; x++) {
-                const colDiv = document.createElement('div');
-                colDiv.className = 'pc-grid-col';
-                colDiv.dataset.x = x;
-                colDiv.dataset.y = y;
-
-                const tag = this.checkCellData(this.pc, x, y);
-                colDiv.textContent = tag;
-
-                rowDiv.appendChild(colDiv);
-            }
-            this.pcGrid.appendChild(rowDiv);
-        }
     },
 
     bindPlayerGrid() {},
