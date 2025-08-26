@@ -1,61 +1,74 @@
 import { Ship, Gameboard, Player } from './classes';
 
-const beginningUI = {
-    init: function () {
-        this.cache();
-        this.bind();
-        this.render();
-    },
+const gameApp = {
+    state: 'setup', // 'setup' initially, then 'playing'
 
-    cache: function () {
+    cache() {
         this.setupSection = document.querySelector('.setup');
         this.playingSection = document.querySelector('.playing');
         this.startBtn = document.querySelector('.start-game');
         this.resetBtn = document.querySelector('.reset');
-        this.playerGrid = this.setupSection.querySelector('.player-grid');
-        this.pcGrid = this.playingSection.querySelector('.pc-grid');
+        this.playerGrid = document.querySelector('.player-grid');
+        this.pcGrid = document.querySelector('.pc-grid');
     },
 
-    bind: function () {
-        this.startBtn.addEventListener('click', () => {
-            this.startGame();
-        });
-
-        this.resetBtn.addEventListener('click', () => {
-            this.resetGame();
-        });
+    bind() {
+        this.startBtn.addEventListener('click', () => this.startGame());
+        this.resetBtn.addEventListener('click', () => this.resetGame());
     },
-    render: function () {},
-    renderBoard: function () {},
 
-    startGame: function () {
-        this.setupSection.classList.add('hidden');
-        this.playingSection.classList.remove('hidden');
-        gameManager.init();
-    },
-    resetGame: function () {
-        this.playingSection.classList.add('hidden');
-        // reset game state
-        this.setupSection.classList.remove('hidden');
-    },
-};
-
-const gameManager = {
-    init: function () {
+    init() {
         this.cache();
         this.bind();
         this.render();
     },
 
-    cache: function () {
-        this.main = document.querySelector('main');
+    render() {
+        if (this.state === 'setup') {
+            this.renderPlayerSetupGrid();
+        } else if (this.state === 'playing') {
+            this.renderPlayerGrid();
+            this.renderPCGrid();
+        }
     },
 
-    bind: function () {},
-    render: function () {},
-    renderBoard: function () {},
+    startGame() {
+        this.state = 'playing';
+        this.setupSection.classList.add('hidden');
+        this.playingSection.classList.remove('hidden');
+        this.render();
+        this.initGame();
+    },
+
+    resetGame() {
+        this.state = 'setup';
+        this.playingSection.classList.add('hidden');
+        this.setupSection.classList.remove('hidden');
+        // reset the game state
+        this.render();
+    },
+
+    renderPlayerSetupGrid() {
+        for (let row = 0; row < 10; row++) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'player-grid-row';
+
+            for (let col = 0; col < 10; col++) {
+                const colDiv = document.createElement('div');
+                colDiv.className = 'player-grid-col';
+                colDiv.dataset.x = col;
+                colDiv.dataset.y = row;
+                rowDiv.appendChild(colDiv);
+            }
+            this.playerGrid.appendChild(rowDiv);
+        }
+    },
+    
+    renderPlayerGrid() {},
+    renderPCGrid() {},
+    initGame() {},
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-    beginningUI.init();
+    gameApp.init();
 });
