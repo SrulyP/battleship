@@ -12,6 +12,7 @@ const gameApp = {
         this.playerGrid = document.querySelector('.player-grid');
         this.playerGridSetup = document.querySelector('.player-grid-setup');
         this.pcGrid = document.querySelector('.pc-grid');
+        this.whoseTurn = document.querySelector('.whose-turn');
     },
 
     bind() {
@@ -28,8 +29,13 @@ const gameApp = {
     },
 
     render() {
-        this.renderPlayerGrid();
-        this.renderPCGrid();
+        this.renderGrid(
+            this.player,
+            this.playerGrid,
+            'player-grid-row',
+            'player-grid-col'
+        );
+        this.renderGrid(this.pc, this.pcGrid, 'pc-grid-row', 'pc-grid-col');
     },
 
     startGame() {
@@ -48,21 +54,8 @@ const gameApp = {
         this.render();
     },
 
-    renderPlayerGrid() {
-        this.renderGrid(
-            this.player,
-            this.playerGrid,
-            'player-grid-row',
-            'player-grid-col'
-        );
-    },
-
-    renderPCGrid() {
-        this.renderGrid(this.pc, this.pcGrid, 'pc-grid-row', 'pc-grid-col');
-    },
-
-    renderGrid(player, grid, rowClass, colClass) {
-        grid.innerHTML = '';
+    initialRender(player, grid, rowClass, colClass) {
+        if (grid.children.length) return;
 
         for (let y = 0; y < 10; y++) {
             const rowDiv = document.createElement('div');
@@ -73,14 +66,42 @@ const gameApp = {
                 colDiv.className = colClass;
                 colDiv.dataset.x = x;
                 colDiv.dataset.y = y;
-
-                const tag = this.checkCellData(player, x, y);
-                colDiv.textContent = tag;
-
                 rowDiv.appendChild(colDiv);
             }
             grid.appendChild(rowDiv);
         }
+    },
+
+    // Put classes to display if cell is hit, miss, ship, or -
+    turnRender(player, grid, colClass) {
+        // get all columns (pc's or player's)
+        const cols = grid.querySelectorAll(`.${colClass}`);
+
+        for (let i = 0; i < cols.length; i++) {
+            const colDiv = cols[i];
+            const x = Number(colDiv.dataset.x);
+            const y = Number(colDiv.dataset.y);
+
+            const tag = this.checkCellData(player, x, y); // 'h', 'm', 's', '-'
+
+            // reset and apply classes
+            colDiv.classList.remove('hit', 'miss', 'ship', 'empty');
+
+            if (tag === 'h') {
+                colDiv.classList.add('hit');
+            } else if (tag === 'm') {
+                colDiv.classList.add('miss');
+            } else if (tag === 's') {
+                colDiv.classList.add('ship');
+            } else {
+                colDiv.classList.add('empty');
+            }
+        }
+    },
+
+    renderGrid(player, grid, rowClass, colClass) {
+        this.initialRender(player, grid, rowClass, colClass);
+        this.turnRender(player, grid, colClass);
     },
 
     checkCellData(player, x, y) {
@@ -117,7 +138,30 @@ const gameApp = {
     },
 
     bindPlayerGrid() {},
-    bindPCGrid() {},
+
+    bindPCGrid() {
+        if (this.alreadyBoundPC) return;
+        this.alreadyBoundPC = true;
+
+        const cols = document.querySelectorAll('.pc-grid-col');
+
+        cols.forEach((cell) => {
+            cell.addEventListener('click', () => {
+                if (this.state !== 'playing') return;
+
+                const x = Number(cell.dataset.x);
+                const y = Number(cell.dataset.y);
+
+                try {
+                    this.pc.gameBoard.receiveAttack([x, y]);
+                    this.turnRender(this.pc, this.pcGrid, 'pc-grid-col');
+                } catch (e) {
+                    this.whoseTurn.textContent = e.message;
+                }
+            });
+        });
+    },
+
     initGame() {},
 };
 
