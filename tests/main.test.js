@@ -112,3 +112,8 @@ it('Gameboard reports if not all ships are sunk', () => {
     game.receiveAttack(attackCords);
     expect(game.allShipsSunk()).toBeFalsy();
 });
+
+it('Player can have a gameboard', () => {
+    const player = new Player('Alice');
+    expect(player.gameBoard).toBeInstanceOf(Gameboard);
+});
