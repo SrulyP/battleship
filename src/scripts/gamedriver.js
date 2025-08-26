@@ -73,7 +73,6 @@ const gameApp = {
     renderPlayerGrid() {
         const board = this.player.gameBoard;
         const grid = this.playerGrid;
-        const boardData = board.getBoard();
         grid.innerHTML = '';
 
         for (let y = 0; y < 10; y++) {
@@ -124,25 +123,32 @@ const gameApp = {
 
         if (wasShot && hasShip) return 'h';
         if (isMiss || (wasShot && !hasShip)) return 'm';
-        if (hasShip) return 's';
+        if (hasShip && player.name !== 'Computer') return 's';
         return '-';
     },
 
     renderPCGrid() {
-        for (let row = 0; row < 10; row++) {
+        const board = this.pc.gameBoard;
+        const grid = this.pcGrid;
+        grid.innerHTML = '';
+
+        for (let y = 0; y < 10; y++) {
             const rowDiv = document.createElement('div');
             rowDiv.className = 'pc-grid-row';
 
-            for (let col = 0; col < 10; col++) {
+            for (let x = 0; x < 10; x++) {
                 const colDiv = document.createElement('div');
                 colDiv.className = 'pc-grid-col';
-                colDiv.dataset.x = col;
-                colDiv.dataset.y = row;
+                colDiv.dataset.x = x;
+                colDiv.dataset.y = y;
+
+                const tag = this.checkCellData(this.pc, x, y);
+                colDiv.textContent = tag;
+
                 rowDiv.appendChild(colDiv);
             }
             this.pcGrid.appendChild(rowDiv);
         }
-        this.bindPCGrid();
     },
 
     bindPlayerGrid() {},
