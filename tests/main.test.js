@@ -100,10 +100,8 @@ it('Gameboard receiveAttack method does not allow for attacking the same cords t
     const attackCords = [3, 2];
     const attackCords2 = [3, 2];
     game.receiveAttack(attackCords);
-    expect(
-        game
-            .receiveAttack(attackCords2)
-            .toThrow('Cannot attack same cords twice')
+    expect(() => game.receiveAttack(attackCords2)).toThrow(
+        'Cannot attack same cords twice'
     );
 });
 
