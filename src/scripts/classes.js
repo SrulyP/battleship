@@ -32,7 +32,7 @@ export class Gameboard {
             this.board.push(rowArray);
         }
     }
-    
+
     getBoard() {
         return this.board;
     }
@@ -61,10 +61,10 @@ export class Gameboard {
         if (x < 0 || x >= 10 || y < 0 || y >= 10) {
             throw new Error('Out of bounds');
         }
-        if (horizontal && y + length >= 10) {
+        if (horizontal && y + length > 10) {
             throw new Error('Ship goes out of horizontal bounds');
         }
-        if (!horizontal && x + length >= 10) {
+        if (!horizontal && x + length > 10) {
             throw new Error('Ship goes out of vertical bounds');
         }
         if (horizontal) {
@@ -106,6 +106,6 @@ export class Gameboard {
 export class Player {
     constructor(name) {
         this.name = name;
-        let gameBoard = new Gameboard();
+        this.gameBoard = new Gameboard();
     }
 }
