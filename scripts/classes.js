@@ -32,6 +32,7 @@ export class Gameboard {
             this.board.push(rowArray);
         }
     }
+    
     getBoard() {
         return this.board;
     }
@@ -103,8 +104,8 @@ export class Gameboard {
 }
 
 export class Player {
-    constructor(player) {
-        this.player = player;
+    constructor(name) {
+        this.name = name;
         let gameBoard = new Gameboard();
     }
 }
