@@ -95,6 +95,18 @@ it('Gameboard receiveAttack method records a miss', () => {
     expect(misses).toContainEqual([3, 2]);
 });
 
+it('Gameboard receiveAttack method does not allow for attacking the same cords twice', () => {
+    const game = new Gameboard();
+    const attackCords = [3, 2];
+    const attackCords2 = [3, 2];
+    game.receiveAttack(attackCords);
+    expect(
+        game
+            .receiveAttack(attackCords2)
+            .toThrow('Cannot attack same cords twice')
+    );
+});
+
 it('Gameboard reports if all ships are sunk', () => {
     const game = new Gameboard();
     const cords = [1, 3, 2, false];
