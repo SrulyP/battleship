@@ -1,4 +1,4 @@
-import { Ship, Gameboard, Player } from './classes';
+import { Ship, Gameboard, Player } from './classes.js';
 
 const gameApp = {
     state: 'setup', // 'setup' initially, then 'playing'
@@ -29,13 +29,13 @@ const gameApp = {
     },
 
     render() {
-        this.renderGrid(
+        this.initialRender(
             this.player,
             this.playerGrid,
             'player-grid-row',
             'player-grid-col'
         );
-        this.renderGrid(this.pc, this.pcGrid, 'pc-grid-row', 'pc-grid-col');
+        this.initialRender(this.pc, this.pcGrid, 'pc-grid-row', 'pc-grid-col');
     },
 
     startGame() {
@@ -43,6 +43,7 @@ const gameApp = {
         this.setupSection.classList.add('hidden');
         this.playingSection.classList.remove('hidden');
         this.render();
+        this.bindPCGrid();
         this.initGame();
     },
 
@@ -50,7 +51,6 @@ const gameApp = {
         this.state = 'setup';
         this.playingSection.classList.add('hidden');
         this.setupSection.classList.remove('hidden');
-        // reset the game state
         this.render();
     },
 
@@ -64,6 +64,7 @@ const gameApp = {
             for (let x = 0; x < 10; x++) {
                 const colDiv = document.createElement('div');
                 colDiv.className = colClass;
+                colDiv.classList.add('empty');
                 colDiv.dataset.x = x;
                 colDiv.dataset.y = y;
                 rowDiv.appendChild(colDiv);
@@ -73,7 +74,7 @@ const gameApp = {
     },
 
     // Put classes to display if cell is hit, miss, ship, or -
-    turnRender(player, grid, colClass) {
+    updateGrid(player, grid, colClass) {
         // get all columns (pc's or player's)
         const cols = grid.querySelectorAll(`.${colClass}`);
 
@@ -82,26 +83,21 @@ const gameApp = {
             const x = Number(colDiv.dataset.x);
             const y = Number(colDiv.dataset.y);
 
-            const tag = this.checkCellData(player, x, y); // 'h', 'm', 's', '-'
+            const tag = this.checkCellData(player, x, y); // 'hit', 'miss', 'ship', '-'
 
             // reset and apply classes
             colDiv.classList.remove('hit', 'miss', 'ship', 'empty');
 
-            if (tag === 'h') {
+            if (tag === 'hit') {
                 colDiv.classList.add('hit');
-            } else if (tag === 'm') {
+            } else if (tag === 'miss') {
                 colDiv.classList.add('miss');
-            } else if (tag === 's') {
+            } else if (tag === 'ship') {
                 colDiv.classList.add('ship');
             } else {
                 colDiv.classList.add('empty');
             }
         }
-    },
-
-    renderGrid(player, grid, rowClass, colClass) {
-        this.initialRender(player, grid, rowClass, colClass);
-        this.turnRender(player, grid, colClass);
     },
 
     checkCellData(player, x, y) {
@@ -131,13 +127,16 @@ const gameApp = {
             }
         }
 
-        if (wasShot && hasShip) return 'h';
-        if (isMiss || (wasShot && !hasShip)) return 'm';
-        if (hasShip && player.name !== 'Computer') return 's';
+        if (wasShot && hasShip) return 'hit';
+        if (isMiss || (wasShot && !hasShip)) return 'miss';
+        if (hasShip && player.name !== 'Computer') return 'ship';
         return '-';
     },
 
-    bindPlayerGrid() {},
+    bindPlayerGrid() {
+        // while (state === 'setup')
+        // while (state === 'playing) no touching
+    },
 
     bindPCGrid() {
         if (this.alreadyBoundPC) return;
@@ -154,7 +153,7 @@ const gameApp = {
 
                 try {
                     this.pc.gameBoard.receiveAttack([x, y]);
-                    this.turnRender(this.pc, this.pcGrid, 'pc-grid-col');
+                    this.updateGrid(this.pc, this.pcGrid, 'pc-grid-col');
                 } catch (e) {
                     this.whoseTurn.textContent = e.message;
                 }
