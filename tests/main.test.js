@@ -1,4 +1,5 @@
-import { Ship, Gameboard, Player } from '../src/scripts/classes';
+import { Ship, Gameboard, Player } from '../src/scripts/classes.js';
+import { gameApp } from '../src/scripts/gamedriver2.js';
 
 it('Ship has a length', () => {
     const ship = new Ship(3);
@@ -137,4 +138,12 @@ it('Gameboard is not shared by players', () => {
     const attackCords = [3, 3];
     player1.gameBoard.receiveAttack(attackCords);
     expect(ship2.hitsAmount).toEqual(0);
+});
+
+it('takeTurn changes current player', () => {
+    const player1 = new Player('me');
+    const player2 = new Player('computer');
+    gameApp.currentTurn = player1;
+    gameApp.takeTurn();
+    expect(gameApp.currentTurn).toEqual(player2);
 });
