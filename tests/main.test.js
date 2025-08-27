@@ -141,10 +141,12 @@ it('Gameboard is not shared by players', () => {
 });
 
 it('takeTurn changes current player', () => {
+    gameApp.whoseTurn = { textContent: '' };
     gameApp.player1 = new Player('me');
     gameApp.player2 = new Player('computer');
     gameApp.currentTurn = gameApp.player1;
     gameApp.takeTurn();
+
     expect(gameApp.currentTurn).toEqual(gameApp.player2);
 });
 
