@@ -132,8 +132,9 @@ it('Gameboard is not shared by players', () => {
     const player1 = new Player('Jim');
     const player2 = new Player('Alice');
     const cords = [3, 3, 3, true];
-    const ship = player1.gameBoard.placeShip(cords);
+    player1.gameBoard.placeShip(cords);
+    const ship2 = player2.gameBoard.placeShip(cords);
     const attackCords = [3, 3];
     player1.gameBoard.receiveAttack(attackCords);
-    expect(ship.hitsAmount).toEqual(1);
+    expect(ship2.hitsAmount).toEqual(0);
 });
