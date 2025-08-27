@@ -46,6 +46,15 @@ export const gameApp = {
     },
 
     bind: function () {
+        // Bind button events
+        this.startBtn.addEventListener('click', () => this.startGame());
+        this.resetBtn.addEventListener('click', () => this.resetGame());
+
+        // Bind grid events
+        this.bindGridEvents();
+    },
+
+    bindGridEvents() {
         const gridSquares = this.pcGrid.querySelectorAll(
             '.grid-piece.computer'
         );
@@ -87,20 +96,22 @@ export const gameApp = {
         player2.gameBoard.placeShip([2, 6, 2, true]);
 
         console.log(player1.gameBoard.getBoard());
+        this.whoseTurn.textContent = 'Your turn';
     },
 
     takeTurn: function () {
         if (this.currentTurn === this.player2) {
+            this.whoseTurn.textContent = "Computer's turn";
             this.computerMove();
             this.currentTurn = this.player1;
         } else {
             // user turn
+            this.whoseTurn.textContent = 'Your turn';
             this.currentTurn = this.player2;
         }
     },
 
     computerMove: function () {
-        this.whoseTurn.textContent = "Computer's turn";
         setTimeout(() => {
             let attacked = false;
             while (!attacked) {
@@ -185,5 +196,23 @@ export const gameApp = {
         if (isMiss || (wasShot && !hasShip)) return 'miss';
         if (hasShip && player.name !== 'computer') return 'ship';
         return 'empty';
+    },
+
+    resetGame: function () {
+        // reset everything
+        this.state = 'setup';
+        this.currentTurn = null;
+        this.player1 = null;
+        this.player2 = null;
+        if (this.hitMessage) this.hitMessage.textContent = '';
+        if (this.whoseTurn) this.whoseTurn.textContent = '';
+
+        // set up again
+        this.cache();
+        this.setupPlayers();
+        this.createGrids();
+        this.bindGridEvents();
+        this.updateGrid(this.player1);
+        this.updateGrid(this.player2);
     },
 };
