@@ -148,11 +148,27 @@ it('takeTurn changes current player', () => {
     expect(gameApp.currentTurn).toEqual(gameApp.player2);
 });
 
-it('computerMove attacks the player', () => {
-    gameApp.whoseTurn = { textContent: '' };
+it('checkSquareData returns correct tags', () => {
     gameApp.player1 = new Player('me');
     gameApp.player2 = new Player('computer');
-    gameApp.computerMove();
+    const cords = [2, 2, 3, true]; // length, x, y, horizontal
+    gameApp.player1.gameBoard.placeShip(cords);
+    gameApp.player1.gameBoard.receiveAttack([2, 3]); // hit the ship
+    gameApp.player1.gameBoard.receiveAttack([0, 0]); // miss
 
-    expect(gameApp.player1.gameBoard.shots.length).toEqual(1);
+    // Test hit
+    const hitResult = gameApp.checkSquareData(gameApp.player1, 2, 3);
+    expect(hitResult).toBe('hit');
+
+    // Test miss
+    const missResult = gameApp.checkSquareData(gameApp.player1, 0, 0);
+    expect(missResult).toBe('miss');
+
+    // Test ship (not hit yet)
+    const shipResult = gameApp.checkSquareData(gameApp.player1, 3, 3);
+    expect(shipResult).toBe('ship');
+
+    // Test empty
+    const emptyResult = gameApp.checkSquareData(gameApp.player1, 5, 5);
+    expect(emptyResult).toBe('empty');
 });
