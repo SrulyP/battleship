@@ -59,6 +59,7 @@ export const gameApp = {
                     ];
                     try {
                         this.player2.gameBoard.receiveAttack(cords);
+                        this.updateGrid(this.player2);
                         this.takeTurn();
                     } catch (error) {
                         // receiveAttack throws error if grid-piece was already attacked,
@@ -108,6 +109,7 @@ export const gameApp = {
                 const cords = [x, y];
                 try {
                     this.player1.gameBoard.receiveAttack(cords);
+                    this.updateGrid(this.player1);
                     attacked = true;
                     this.whoseTurn.textContent = 'Your turn';
                 } catch (error) {
@@ -119,7 +121,13 @@ export const gameApp = {
     },
 
     // Put classes to display if cell is a ship, was hit, was a miss, or is untouched
-    updateGrid(player, grid) {
+    updateGrid(player) {
+        let grid = null;
+        if (player === this.player1) {
+            grid = this.playerGrid;
+        } else {
+            grid = this.pcGrid;
+        }
         // get all squares (pc's or player's)
         const squares = grid.querySelectorAll(`.grid-piece.${player.name}`);
 
@@ -148,14 +156,14 @@ export const gameApp = {
 
     checkSquareData(player, x, y) {
         const playerBoard = player.gameBoard.getBoard();
-        const squareData = playerBoard[x][y];
+        const squareData = playerBoard[y][x];
         const hasShip = squareData instanceof Ship;
 
         // Check if the square was shot at
         let wasShot = false;
-        for (let i = 0; i < board.shots.length; i++) {
+        for (let i = 0; i < player.gameBoard.shots.length; i++) {
             // take the cords of the current shot
-            const [sx, sy] = board.shots[i];
+            const [sx, sy] = player.gameBoard.shots[i];
             // check if the cords of the shot are equal to the cords of the passed square
             if (sx === x && sy === y) {
                 wasShot = true;
@@ -165,8 +173,8 @@ export const gameApp = {
 
         // If it was shot at, check if it was a miss
         let isMiss = false;
-        for (let i = 0; i < board.misses.length; i++) {
-            const [mx, my] = board.misses[i];
+        for (let i = 0; i < player.gameBoard.misses.length; i++) {
+            const [mx, my] = player.gameBoard.misses[i];
             if (mx === x && my === y) {
                 isMiss = true;
                 break;
