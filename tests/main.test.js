@@ -148,5 +148,11 @@ it('takeTurn changes current player', () => {
     expect(gameApp.currentTurn).toEqual(gameApp.player2);
 });
 
+it('computerMove attacks the player', () => {
+    gameApp.whoseTurn = { textContent: '' };
+    gameApp.player1 = new Player('me');
+    gameApp.player2 = new Player('computer');
+    gameApp.computerMove();
 
-
+    expect(gameApp.player1.gameBoard.shots.length).toEqual(1);
+});
