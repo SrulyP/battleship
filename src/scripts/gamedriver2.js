@@ -1,6 +1,7 @@
 import { Ship, Gameboard, Player } from './classes.js';
 
 export const gameApp = {
+    state: 'setup', // 'setup' and 'playing'
     currentTurn: null,
     player1: null,
     player2: null,
@@ -26,8 +27,8 @@ export const gameApp = {
     },
 
     createGrids: function () {
-        this.createGrids(this.playerGrid, this.player1);
-        this.createGrids(this.pcGrid, this.player2);
+        this.createGrid(this.playerGrid, this.player1);
+        this.createGrid(this.pcGrid, this.player2);
     },
 
     createGrid: function (grid, player) {
@@ -52,10 +53,18 @@ export const gameApp = {
         gridSquares.forEach((square) => {
             square.addEventListener('click', () => {
                 if (this.currentTurn === this.player1) {
-                    // get cords of attack,
-                    // check if its a hit, miss, etc.
-                    // update the display
-                    this.takeTurn();
+                    const cords = [
+                        Number(square.dataset.x),
+                        Number(square.dataset.y),
+                    ];
+                    try {
+                        this.player2.gameBoard.receiveAttack(cords);
+                        this.takeTurn();
+                    } catch (error) {
+                        // receiveAttack throws error if grid-piece was already attacked,
+                        // so display the error
+                        this.hitMessage.textContent = error.message;
+                    }
                 }
             });
         });
@@ -81,7 +90,7 @@ export const gameApp = {
 
     takeTurn: function () {
         if (this.currentTurn === this.player2) {
-            computerMove();
+            this.computerMove();
             this.currentTurn = this.player1;
         } else {
             // user turn
@@ -91,19 +100,21 @@ export const gameApp = {
 
     computerMove: function () {
         this.whoseTurn.textContent = "Computer's turn";
-        setTimeout(() => {}, 3000);
-        let attacked = false;
-        while (!attacked) {
-            const x = Math.floor(Math.random() * 10);
-            const y = Math.floor(Math.random() * 10);
-            const cords = [x, y];
-            try {
-                this.player1.gameBoard.receiveAttack(cords);
-                attacked = true;
-            } catch (error) {
-                // receiveAttack throws error if grid-piece was already attacked, so re-run in this case
-                continue;
+        setTimeout(() => {
+            let attacked = false;
+            while (!attacked) {
+                const x = Math.floor(Math.random() * 10);
+                const y = Math.floor(Math.random() * 10);
+                const cords = [x, y];
+                try {
+                    this.player1.gameBoard.receiveAttack(cords);
+                    attacked = true;
+                    this.whoseTurn.textContent = 'Your turn';
+                } catch (error) {
+                    // receiveAttack throws error if grid-piece was already attacked, so re-run in this case
+                    continue;
+                }
             }
-        }
+        }, 1500);
     },
 };
