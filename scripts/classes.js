@@ -45,11 +45,11 @@ export class Gameboard {
         this.checkBounds(cords);
         if (horizontal) {
             for (let i = 0; i < length; i++) {
-                board[x][y + i] = ship;
+                board[y][x + i] = ship;
             }
         } else {
             for (let i = 0; i < length; i++) {
-                board[x + i][y] = ship;
+                board[y + i][x] = ship;
             }
         }
         this.activeShips.push(ship);
@@ -62,22 +62,22 @@ export class Gameboard {
         if (x < 0 || x >= 10 || y < 0 || y >= 10) {
             throw new Error('Out of bounds');
         }
-        if (horizontal && y + length > 10) {
+        if (horizontal && x + length > 10) {
             throw new Error('Ship goes out of horizontal bounds');
         }
-        if (!horizontal && x + length > 10) {
+        if (!horizontal && y + length > 10) {
             throw new Error('Ship goes out of vertical bounds');
         }
         if (horizontal) {
             for (let i = 0; i < length; i++) {
-                if (board[x][y + i] !== 0) {
+                if (board[y][x + i] !== 0) {
                     throw new Error('Space not empty');
                 }
             }
         }
         if (!horizontal) {
             for (let i = 0; i < length; i++) {
-                if (board[x + i][y] !== 0) {
+                if (board[y + i][x] !== 0) {
                     throw new Error('Space not empty');
                 }
             }
@@ -91,10 +91,10 @@ export class Gameboard {
         }
         this.shots.push(attackCords);
         const [x, y] = attackCords;
-        if (board[x][y] === 0) {
+        if (board[y][x] === 0) {
             this.misses.push(attackCords);
         } else {
-            let ship = board[x][y];
+            let ship = board[y][x];
             ship.hit();
             if (ship.isSunk()) {
                 const index = this.activeShips.indexOf(ship);
