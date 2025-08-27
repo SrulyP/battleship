@@ -1,6 +1,6 @@
 import { Ship, Gameboard, Player } from './classes.js';
 
-const gameApp = {
+export const gameApp = {
     currentTurn: null,
     player1: null,
     player2: null,
@@ -45,13 +45,18 @@ const gameApp = {
     },
 
     bind: function () {
-        const gridSquares = this.pcGrid.querySelectorAll('.grid-square');
+        const gridSquares = this.pcGrid.querySelectorAll(
+            '.grid-piece.computer'
+        );
 
         gridSquares.forEach((square) => {
             square.addEventListener('click', () => {
                 if (this.currentTurn === this.player1) {
+                    // get cords of attack,
+                    // check if its a hit, miss, etc.
+                    // update the display
+                    this.takeTurn();
                 }
-                // evaluate click
             });
         });
     },
@@ -60,8 +65,8 @@ const gameApp = {
 
     setupPlayers: function () {
         // for now, setup players w/ ships on their boards:
-        const player1 = new Player('Me');
-        const player2 = new Player('Computer');
+        const player1 = new Player('me');
+        const player2 = new Player('computer');
         this.currentTurn = player1;
 
         player1.gameBoard.placeShip([3, 0, 4, true]); // length, x, y, horizontal
@@ -75,12 +80,13 @@ const gameApp = {
     },
 
     takeTurn: function () {
-        if (this.player === this.player2) {
+        if (this.currentTurn === this.player2) {
             computerMove();
-            this.player = this.player1;
+            this.currentTurn = this.player1;
+        } else {
+            // user turn
+            this.currentTurn = this.player2;
         }
-        // user turn
-        this.player = this.player2;
     },
 
     computerMove: function () {
