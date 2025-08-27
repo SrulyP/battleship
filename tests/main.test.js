@@ -44,7 +44,7 @@ it('Gameboard can place ships at specific coordinates.', () => {
     const cords = [2, 2, 3, true]; // length, x, y, horizontal
     const ship = new Ship(cords[0]);
     game.placeShip(cords);
-    expect(board[2][3]).toEqual(ship);
+    expect(board[3][2]).toEqual(ship);
 });
 
 it('Gameboard places correct ship length on board.', () => {
@@ -53,7 +53,7 @@ it('Gameboard places correct ship length on board.', () => {
     const cords = [2, 2, 3, true]; // length, x, y, horizontal
     const ship = new Ship(cords[0]);
     game.placeShip(cords);
-    expect(board[2][4]).toEqual(ship);
+    expect(board[3][3]).toEqual(ship);
 });
 
 it('Gameboard cannot place ships out of bounds.', () => {
