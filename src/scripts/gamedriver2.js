@@ -1,14 +1,61 @@
 import { Ship, Gameboard, Player } from './classes.js';
 
 const gameApp = {
-    currentTurn,
+    currentTurn: null,
+    player1: null,
+    player2: null,
 
     init: function () {
         this.setupPlayers();
+        this.cache();
+        this.createGrids();
+        this.bind();
+        this.render();
     },
 
-    cache: function () {},
-    bind: function () {},
+    cache: function () {
+        this.setupSection = document.querySelector('.setup');
+        this.playingSection = document.querySelector('.playing');
+        this.startBtn = document.querySelector('.start-game');
+        this.resetBtn = document.querySelector('.reset');
+        this.playerGrid = document.querySelector('.player-grid');
+        this.playerGridSetup = document.querySelector('.player-grid-setup');
+        this.pcGrid = document.querySelector('.pc-grid');
+        this.whoseTurn = document.querySelector('.whose-turn');
+        this.hitMessage = document.querySelector('.hit-message');
+    },
+
+    createGrids: function () {
+        this.createGrids(this.playerGrid, this.player1);
+        this.createGrids(this.pcGrid, this.player2);
+    },
+
+    createGrid: function (grid, player) {
+        grid.innerHTML = '';
+        for (let y = 0; y < 10; y++) {
+            for (let x = 0; x < 10; x++) {
+                const gridPiece = document.createElement('div');
+                gridPiece.classList.add('grid-piece');
+                gridPiece.classList.add(`${player.name}`);
+                gridPiece.dataset.x = x;
+                gridPiece.dataset.y = y;
+                grid.appendChild(gridPiece);
+            }
+        }
+    },
+
+    bind: function () {
+        const gridSquares = this.pcGrid.querySelectorAll('.grid-square');
+
+        gridSquares.forEach((square) => {
+            square.addEventListener('click', () => {
+                if (this.currentTurn === this.player1) {
+                }
+                // evaluate click
+            });
+        });
+    },
+
     render: function () {},
 
     setupPlayers: function () {
@@ -27,17 +74,20 @@ const gameApp = {
         console.log(player1.gameBoard.getBoard());
     },
 
-    takeTurn: function (player) {
-        if (player.name === 'computer') {
+    takeTurn: function () {
+        if (this.player === this.player2) {
             computerMove();
+            this.player = this.player1;
         }
         // user turn
+        this.player = this.player2;
     },
 
     computerMove: function () {
-        // delay for a few seconds
-        // while not attacked:
-        //  choose attack cords
+        this.whoseTurn.textContent = "Computer's turn";
+        // while pc has not attacked:
+        // choose attack cords
         // try to attack
+        setTimeout(() => {}, 3000);
     },
 };
