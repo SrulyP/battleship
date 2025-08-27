@@ -127,3 +127,13 @@ it('Player can have a gameboard', () => {
     const player = new Player('Alice');
     expect(player.gameBoard).toBeInstanceOf(Gameboard);
 });
+
+it('Gameboard is not shared by players', () => {
+    const player1 = new Player('Jim');
+    const player2 = new Player('Alice');
+    const cords = [3, 3, 3, true];
+    const ship = player1.gameBoard.placeShip(cords);
+    const attackCords = [3, 3];
+    player1.gameBoard.receiveAttack(attackCords);
+    expect(ship.hitsAmount).toEqual(1);
+});
