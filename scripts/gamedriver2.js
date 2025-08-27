@@ -91,9 +91,19 @@ export const gameApp = {
 
     computerMove: function () {
         this.whoseTurn.textContent = "Computer's turn";
-        // while pc has not attacked:
-        // choose attack cords
-        // try to attack
         setTimeout(() => {}, 3000);
+        let attacked = false;
+        while (!attacked) {
+            const x = Math.floor(Math.random() * 10);
+            const y = Math.floor(Math.random() * 10);
+            const cords = [x, y];
+            try {
+                this.player1.gameBoard.receiveAttack(cords);
+                attacked = true;
+            } catch (error) {
+                // receiveAttack throws error if grid-piece was already attacked, so re-run in this case
+                continue;
+            }
+        }
     },
 };
