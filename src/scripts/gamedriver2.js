@@ -82,7 +82,6 @@ export const gameApp = {
         const gridSquares = this.pcGrid.querySelectorAll(
             '.grid-piece.computer'
         );
-
         gridSquares.forEach((square) => {
             square.addEventListener('click', () => {
                 if (this.currentTurn === this.player1) {
@@ -93,10 +92,9 @@ export const gameApp = {
                     try {
                         this.player2.gameBoard.receiveAttack(cords);
                         this.updateGrid(this.player2);
+                        this.displayHitMessage(this.player2, cords);
                         this.takeTurn();
                     } catch (error) {
-                        // receiveAttack throws error if grid-piece was already attacked,
-                        // so display the error
                         this.hitMessage.textContent = error.message;
                     }
                 }
@@ -137,15 +135,21 @@ export const gameApp = {
     // ============================================= Gameplay =============================================
 
     takeTurn: function () {
+        if (
+            this.player2.gameBoard.allShipsSunk() ||
+            this.player1.gameBoard.allShipsSunk()
+        ) {
+            this.displayTurnMessage();
+            return;
+        }
+
         if (this.currentTurn === this.player1) {
-            // Switch to computer's turn
             this.currentTurn = this.player2;
-            this.whoseTurn.textContent = "Enemy's turn";
+            this.displayTurnMessage();
             this.computerMove();
         } else {
-            // Switch to player's turn
             this.currentTurn = this.player1;
-            this.whoseTurn.textContent = 'Your turn';
+            this.displayTurnMessage();
         }
     },
 
@@ -159,11 +163,10 @@ export const gameApp = {
                 try {
                     this.player1.gameBoard.receiveAttack(cords);
                     this.updateGrid(this.player1);
+                    this.displayHitMessage(this.player1, cords);
                     attacked = true;
-                    this.whoseTurn.textContent = 'Your turn';
                     this.takeTurn();
                 } catch (error) {
-                    // receiveAttack throws error if grid-piece was already attacked, so re-run in this case
                     continue;
                 }
             }
@@ -239,6 +242,50 @@ export const gameApp = {
         return 'empty';
     },
 
+    displayHitMessage: function (player, cords) {
+        const board = player.gameBoard;
+        const [x, y] = cords;
+        const square = board.getBoard()[y][x];
+        const isShip = square instanceof Ship;
+        const isSunk = isShip && square.isSunk();
+
+        if (!isShip) {
+            this.hitMessage.textContent =
+                player.name === 'computer'
+                    ? 'You shot and missed.'
+                    : 'The enemy shot and missed.';
+        } else if (isSunk) {
+            this.hitMessage.textContent =
+                player.name === 'computer'
+                    ? "You hit and sunk the enemy's ship!"
+                    : 'The enemy hit and sunk your ship!';
+        } else {
+            this.hitMessage.textContent =
+                player.name === 'computer'
+                    ? "You hit the enemy's ship!"
+                    : 'The enemy hit your ship!';
+        }
+    },
+
+    displayTurnMessage: function () {
+        if (this.player2.gameBoard.allShipsSunk()) {
+            this.whoseTurn.textContent = 'Game Over: You Win!';
+            this.hitMessage.textContent = '';
+            return;
+        }
+        if (this.player1.gameBoard.allShipsSunk()) {
+            this.whoseTurn.textContent = 'Game Over: Enemy Wins!';
+            this.hitMessage.textContent = '';
+            return;
+        }
+
+        if (this.currentTurn === this.player1) {
+            this.whoseTurn.textContent = 'Your turn';
+        } else {
+            this.whoseTurn.textContent = "Enemy's turn";
+        }
+    },
+
     // ============================================= Reset Game =============================================
 
     resetGame: function () {
@@ -257,6 +304,7 @@ export const gameApp = {
         this.bindGridEvents();
         this.updateGrid(this.player1);
         this.updateGrid(this.player2);
+        this.render();
     },
 };
 
