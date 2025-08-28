@@ -1,10 +1,26 @@
 import { Ship, Gameboard, Player } from './classes.js';
 
-const gameApp = {
-    state: 'setup', // 'setup' initially, then 'playing'
-    turn: 'player',
+export const gameApp = {
+    state: 'setup', // 'setup' and 'playing'
+    currentTurn: null,
+    player1: null,
+    player2: null,
 
-    cache() {
+    // ============================================= Initialization and Setup =============================================
+
+    init: function () {
+        this.cache();
+        this.setupPlayers();
+        this.createGrids();
+        this.bind();
+        this.render();
+
+        // Initial grid updates to show player's ships
+        this.updateGrid(this.player1);
+        this.updateGrid(this.player2);
+    },
+
+    cache: function () {
         this.setupSection = document.querySelector('.setup');
         this.playingSection = document.querySelector('.playing');
         this.startBtn = document.querySelector('.start-game');
@@ -13,104 +29,205 @@ const gameApp = {
         this.playerGridSetup = document.querySelector('.player-grid-setup');
         this.pcGrid = document.querySelector('.pc-grid');
         this.whoseTurn = document.querySelector('.whose-turn');
+        this.hitMessage = document.querySelector('.hit-message');
     },
 
-    bind() {
+    setupPlayers: function () {
+        this.player1 = new Player('me');
+        this.player2 = new Player('computer');
+        this.currentTurn = this.player1;
+
+        this.player1.gameBoard.placeShip([3, 0, 4, true]); // length, x, y, horizontal
+        this.player1.gameBoard.placeShip([4, 4, 2, false]);
+        this.player1.gameBoard.placeShip([2, 6, 2, true]);
+        this.player2.gameBoard.placeShip([3, 0, 4, true]);
+        this.player2.gameBoard.placeShip([4, 4, 2, false]);
+        this.player2.gameBoard.placeShip([2, 6, 2, true]);
+
+        this.updateStartButton();
+        this.whoseTurn.textContent = 'Your turn';
+        this.hitMessage.textContent =
+            "To start the game, click a square in the enemy's grid.";
+    },
+
+    createGrids: function () {
+        this.createGrid(this.playerGrid, this.player1);
+        this.createGrid(this.pcGrid, this.player2);
+    },
+
+    createGrid: function (grid, player) {
+        grid.innerHTML = '';
+        for (let y = 0; y < 10; y++) {
+            for (let x = 0; x < 10; x++) {
+                const gridPiece = document.createElement('div');
+                gridPiece.classList.add('grid-piece');
+                gridPiece.classList.add(`${player.name}`);
+                gridPiece.dataset.x = x;
+                gridPiece.dataset.y = y;
+                grid.appendChild(gridPiece);
+            }
+        }
+    },
+
+    bind: function () {
+        // Bind button events
         this.startBtn.addEventListener('click', () => this.startGame());
         this.resetBtn.addEventListener('click', () => this.resetGame());
+
+        // Bind grid events
+        this.bindGridEvents();
     },
 
-    init() {
-        this.cache();
-        this.bind();
-        this.player = new Player('You');
-        this.pc = new Player('Computer');
-        this.render();
-    },
-
-    render() {
-        this.initialRender(
-            this.player,
-            this.playerGrid,
-            'player-grid-row',
-            'player-grid-col'
+    bindGridEvents() {
+        const gridSquares = this.pcGrid.querySelectorAll(
+            '.grid-piece.computer'
         );
-        this.initialRender(this.pc, this.pcGrid, 'pc-grid-row', 'pc-grid-col');
+        gridSquares.forEach((square) => {
+            const x = Number(square.dataset.x);
+            const y = Number(square.dataset.y);
+            square.style.cursor = 'pointer';
+
+            square.addEventListener('click', () => {
+                if (
+                    this.currentTurn === this.player1 &&
+                    !this.player1.gameBoard.allShipsSunk() &&
+                    !this.player2.gameBoard.allShipsSunk()
+                ) {
+                    const cords = [
+                        Number(square.dataset.x),
+                        Number(square.dataset.y),
+                    ];
+                    try {
+                        this.player2.gameBoard.receiveAttack(cords);
+                        this.updateGrid(this.player2);
+                        this.displayHitMessage(this.player2, cords);
+                        this.takeTurn();
+                    } catch (error) {
+                        this.hitMessage.textContent = error.message;
+                    }
+                }
+            });
+        });
     },
 
-    startGame() {
-        this.state = 'playing';
-        this.setupSection.classList.add('hidden');
-        this.playingSection.classList.remove('hidden');
-        this.render();
-        this.bindPCGrid();
-        this.initGame();
-    },
-
-    resetGame() {
-        this.state = 'setup';
-        this.playingSection.classList.add('hidden');
-        this.setupSection.classList.remove('hidden');
-        this.render();
-    },
-
-    initialRender(player, grid, rowClass, colClass) {
-        if (grid.children.length) return;
-
-        for (let y = 0; y < 10; y++) {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = rowClass;
-
-            for (let x = 0; x < 10; x++) {
-                const colDiv = document.createElement('div');
-                colDiv.className = colClass;
-                colDiv.classList.add('empty');
-                colDiv.dataset.x = x;
-                colDiv.dataset.y = y;
-                rowDiv.appendChild(colDiv);
-            }
-            grid.appendChild(rowDiv);
+    render: function () {
+        if (this.state === 'setup') {
+            this.setupSection.classList.remove('hidden');
+            this.playingSection.classList.add('hidden');
+        } else {
+            this.setupSection.classList.add('hidden');
+            this.playingSection.classList.remove('hidden');
         }
     },
 
-    // Put classes to display if cell is hit, miss, ship, or -
-    updateGrid(player, grid, colClass) {
-        // get all columns (pc's or player's)
-        const cols = grid.querySelectorAll(`.${colClass}`);
+    updateStartButton() {
+        if (this.allShipsPlaced()) {
+            this.startBtn.classList.remove('grayed-out');
+            this.startBtn.disabled = false;
+        } else {
+            this.startBtn.classList.add('grayed-out');
+            this.startBtn.disabled = true;
+        }
+    },
 
-        for (let i = 0; i < cols.length; i++) {
-            const colDiv = cols[i];
-            const x = Number(colDiv.dataset.x);
-            const y = Number(colDiv.dataset.y);
+    startGame: function () {
+        if (!this.allShipsPlaced()) return;
+        this.state = 'playing';
+        this.render();
+    },
 
-            const tag = this.checkCellData(player, x, y); // 'hit', 'miss', 'ship', '-'
+    allShipsPlaced: function () {
+        return this.player1.gameBoard.activeShips.length === 3;
+    },
+
+    // ============================================= Gameplay =============================================
+
+    takeTurn: function () {
+        if (
+            this.player2.gameBoard.allShipsSunk() ||
+            this.player1.gameBoard.allShipsSunk()
+        ) {
+            this.displayTurnMessage();
+            return;
+        }
+
+        if (this.currentTurn === this.player1) {
+            this.currentTurn = this.player2;
+            this.displayTurnMessage();
+            this.computerMove();
+        } else {
+            this.currentTurn = this.player1;
+            this.displayTurnMessage();
+        }
+    },
+
+    computerMove: function () {
+        setTimeout(() => {
+            let attacked = false;
+            while (!attacked) {
+                const x = Math.floor(Math.random() * 10);
+                const y = Math.floor(Math.random() * 10);
+                const cords = [x, y];
+                try {
+                    this.player1.gameBoard.receiveAttack(cords);
+                    this.updateGrid(this.player1);
+                    this.displayHitMessage(this.player1, cords);
+                    attacked = true;
+                    this.takeTurn();
+                } catch (error) {
+                    continue;
+                }
+            }
+        }, 1500);
+    },
+
+    // ============================================= Dynamic Display Based on Gameplay =============================================
+
+    // Put classes to display if cell is a ship, was hit, was a miss, or is untouched
+    updateGrid(player) {
+        let grid = null;
+        if (player === this.player1) {
+            grid = this.playerGrid;
+        } else {
+            grid = this.pcGrid;
+        }
+        // get all squares (pc's or player's)
+        const squares = grid.querySelectorAll(`.grid-piece.${player.name}`);
+
+        for (let i = 0; i < squares.length; i++) {
+            const square = squares[i];
+            const x = Number(square.dataset.x);
+            const y = Number(square.dataset.y);
+
+            // check if the square has been hit, missed, or has not been attacked yet.
+            const tag = this.checkSquareData(player, x, y);
 
             // reset and apply classes
-            colDiv.classList.remove('hit', 'miss', 'ship', 'empty');
+            square.classList.remove('hit', 'miss', 'ship', 'empty');
 
             if (tag === 'hit') {
-                colDiv.classList.add('hit');
+                square.classList.add('hit');
             } else if (tag === 'miss') {
-                colDiv.classList.add('miss');
+                square.classList.add('miss');
             } else if (tag === 'ship') {
-                colDiv.classList.add('ship');
+                square.classList.add('ship');
             } else {
-                colDiv.classList.add('empty');
+                square.classList.add('empty');
             }
         }
     },
 
-    checkCellData(player, x, y) {
-        const board = player.gameBoard;
-        const cellData = board.getBoard()[x][y];
-        const hasShip = cellData instanceof Ship;
+    checkSquareData(player, x, y) {
+        const playerBoard = player.gameBoard.getBoard();
+        const squareData = playerBoard[y][x];
+        const hasShip = squareData instanceof Ship;
 
-        // Check if the cell was shot at
+        // Check if the square was shot at
         let wasShot = false;
-        for (let i = 0; i < board.shots.length; i++) {
+        for (let i = 0; i < player.gameBoard.shots.length; i++) {
             // take the cords of the current shot
-            const [sx, sy] = board.shots[i];
-            // check if the cords of the shot are equal to the cords of the passed cell
+            const [sx, sy] = player.gameBoard.shots[i];
+            // check if the cords of the shot are equal to the cords of the passed square
             if (sx === x && sy === y) {
                 wasShot = true;
                 break;
@@ -119,8 +236,8 @@ const gameApp = {
 
         // If it was shot at, check if it was a miss
         let isMiss = false;
-        for (let i = 0; i < board.misses.length; i++) {
-            const [mx, my] = board.misses[i];
+        for (let i = 0; i < player.gameBoard.misses.length; i++) {
+            const [mx, my] = player.gameBoard.misses[i];
             if (mx === x && my === y) {
                 isMiss = true;
                 break;
@@ -129,41 +246,78 @@ const gameApp = {
 
         if (wasShot && hasShip) return 'hit';
         if (isMiss || (wasShot && !hasShip)) return 'miss';
-        if (hasShip && player.name !== 'Computer') return 'ship';
-        return '-';
+        if (hasShip && player.name !== 'computer') return 'ship';
+        return 'empty';
     },
 
-    bindPlayerGrid() {
-        // while (state === 'setup')
-        // while (state === 'playing) no touching
+    displayHitMessage: function (player, cords) {
+        const board = player.gameBoard;
+        const [x, y] = cords;
+        const square = board.getBoard()[y][x];
+        const isShip = square instanceof Ship;
+        const isSunk = isShip && square.isSunk();
+
+        if (!isShip) {
+            this.hitMessage.textContent =
+                player.name === 'computer'
+                    ? 'You shot and missed.'
+                    : 'The enemy shot and missed.';
+        } else if (isSunk) {
+            this.hitMessage.textContent =
+                player.name === 'computer'
+                    ? "You hit and sunk the enemy's ship!"
+                    : 'The enemy hit and sunk your ship!';
+        } else {
+            this.hitMessage.textContent =
+                player.name === 'computer'
+                    ? "You hit the enemy's ship!"
+                    : 'The enemy hit your ship!';
+        }
     },
 
-    bindPCGrid() {
-        if (this.alreadyBoundPC) return;
-        this.alreadyBoundPC = true;
+    displayTurnMessage: function () {
+        if (this.player2.gameBoard.allShipsSunk()) {
+            this.whoseTurn.textContent = 'Game Over: You Win!';
+            this.hitMessage.textContent = '';
+            return;
+        }
+        if (this.player1.gameBoard.allShipsSunk()) {
+            this.whoseTurn.textContent = 'Game Over: Enemy Wins!';
+            this.hitMessage.textContent = '';
+            return;
+        }
 
-        const cols = document.querySelectorAll('.pc-grid-col');
-
-        cols.forEach((cell) => {
-            cell.addEventListener('click', () => {
-                if (this.state !== 'playing') return;
-
-                const x = Number(cell.dataset.x);
-                const y = Number(cell.dataset.y);
-
-                try {
-                    this.pc.gameBoard.receiveAttack([x, y]);
-                    this.updateGrid(this.pc, this.pcGrid, 'pc-grid-col');
-                } catch (e) {
-                    this.whoseTurn.textContent = e.message;
-                }
-            });
-        });
+        if (this.currentTurn === this.player1) {
+            this.whoseTurn.textContent = 'Your turn';
+        } else {
+            this.whoseTurn.textContent = "Enemy's turn";
+        }
     },
 
-    initGame() {},
+    // ============================================= Reset Game =============================================
+
+    resetGame: function () {
+        // reset everything
+        this.state = 'setup';
+        this.currentTurn = null;
+        this.player1 = null;
+        this.player2 = null;
+        if (this.hitMessage) this.hitMessage.textContent = '';
+        if (this.whoseTurn) this.whoseTurn.textContent = '';
+
+        // set up again
+        this.cache();
+        this.setupPlayers();
+        this.createGrids();
+        this.bindGridEvents();
+        this.updateGrid(this.player1);
+        this.updateGrid(this.player2);
+        this.render();
+    },
 };
 
-document.addEventListener('DOMContentLoaded', function () {
+// ============================================= Initialize App =============================================
+
+document.addEventListener('DOMContentLoaded', () => {
     gameApp.init();
 });
