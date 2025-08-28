@@ -3,6 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="./css/reset.css" />
+        <link rel="stylesheet" href="./css/styles.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+            rel="stylesheet"
+        />
         <title>Battleship</title>
     </head>
     <body>
@@ -11,7 +19,11 @@
             <!-- Setup section -->
             <section class="setup">
                 <h2>Place Your Ships</h2>
-                <div class="player-grid"></div>
+                <div class="player-grid-setup-section">
+                    <button class="rotate-btn">Rotate Axis</button>
+                    <div class="ships"></div>
+                    <div class="player-grid-setup"></div>
+                </div>
                 <button class="start-game">Start Game</button>
             </section>
 
@@ -20,12 +32,15 @@
                 <h2 class="whose-turn">Your Turn</h2>
                 <h3 class="hit-message"></h3>
 
-                <div class="player-grid"></div>
-                <div class="pc-grid"></div>
+                <div class="board-container">
+                    <div class="player-grid"></div>
+                    <div class="pc-grid"></div>
+                </div>
 
                 <button class="reset">Reset Game</button>
             </section>
         </main>
         <footer>&copy; SrulyP 2025</footer>
+        <script type="module" src="./scripts/gamedriver2.js"></script>
     </body>
 </html>
