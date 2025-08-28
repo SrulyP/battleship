@@ -1,8 +1,15 @@
 /* ==================================== Root and All ==================================== */
 
-/* :root {
-  
-} */
+:root {
+  --red: #85282b;
+  --orange: #d64045ff;
+  --white-green: #e9fff9ff;
+  --light-blue: #9ed8dbff;
+  --gray: #b0b0b0;
+  --medium-blue: #467599ff;
+  --dark-blue: #1d3354ff;
+  --black: #151d29;
+}
 
 * {
   margin: 0;
@@ -12,39 +19,155 @@
     'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
     sans-serif;
 }
-html {
-  height: 100%;
-}
 
+html,
 body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* background-color: var();
-  color: var(); */
 }
 
-/* ==================================== Header, Main, and Footer  ==================================== */
-
-main {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-}
-
-footer {
-  padding: 10px;
-  font-weight: 500;
-  /* color: var(); */
-  margin-top: auto;
-}
+/* ==================================== Header ==================================== */
 
 header {
-  /* background-color: var(); */
-  padding: 20px 30px;
-  width: 100%;
+  font-size: 2rem;
+  padding: 20px;
+  text-align: center;
+  background-color: var(--dark-blue);
+  color: var(--white-green);
+  letter-spacing: 0.25rem;
+  text-shadow: 1px 1px var(--black), 2px 2px 0 var(--red);
+  border-bottom: 2px solid var(--medium-blue);
+}
+
+/* ==================================== Main ==================================== */
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--light-blue);
+  padding: 20px;
+  gap: 20px;
+}
+
+h2,
+h3 {
+  color: var(--dark-blue);
+  margin-bottom: 10px;
+}
+
+/* ==================================== Setup Section ==================================== */
+
+.setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  background-color: var(--white-green);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.15);
+}
+
+.rotate-btn,
+.start-game,
+.reset {
+  border: 1px solid var(--medium-blue);
+  background-color: var(--white-green);
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.rotate-btn:hover,
+.start-game:hover,
+.reset:hover {
+  background-color: var(--orange);
+  color: var(--white-green);
+}
+
+.rotate-btn:active,
+.start-game:active,
+.reset:active {
+  background-color: var(--red);
+  color: var(--white-green);
+}
+
+/* ==================================== Game Section ==================================== */
+
+.playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background-color: var(--white-green);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.15);
+}
+
+.board-container {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-grid,
+.pc-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  width: 300px;
+  height: 300px;
+  background-color: var(--light-blue);
+  gap: 2px;
+  padding: 5px;
+  border-radius: 8px;
+}
+
+.grid-piece {
+  background-color: var(--white-green);
+  border: 1px solid var(--medium-blue);
+  border-radius: 3px;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* border-bottom: 2px solid var(); */
+}
+
+/* ------------- Attacked Pieces ------------- */
+.grid-piece.hit {
+  background-color: var(--red);
+}
+
+.grid-piece.miss {
+  background-color: var(--gray);
+}
+
+.grid-piece.ship {
+  background-color: var(--dark-blue);
+}
+
+.grid-piece.empty {
+  background-color: var(--white-green);
+}
+
+/* ==================================== Hidden ==================================== */
+
+.hidden {
+  display: none;
+}
+
+/* ==================================== Footer ==================================== */
+
+footer {
+  padding: 12px;
+  background-color: var(--dark-blue);
+  color: var(--white-green);
+  font-weight: 500;
 }
