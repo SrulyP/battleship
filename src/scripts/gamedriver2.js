@@ -7,11 +7,15 @@ export const gameApp = {
     player2: null,
 
     init: function () {
-        this.setupPlayers();
         this.cache();
+        this.setupPlayers();
         this.createGrids();
         this.bind();
         this.render();
+        
+        // Initial grid updates to show player's ships
+        this.updateGrid(this.player1);
+        this.updateGrid(this.player2);
     },
 
     cache: function () {
@@ -80,22 +84,50 @@ export const gameApp = {
         });
     },
 
-    render: function () {},
+    render: function () {
+        if (this.state === 'setup') {
+            this.setupSection.classList.remove('hidden');
+            this.playingSection.classList.add('hidden');
+        } else {
+            this.setupSection.classList.add('hidden');
+            this.playingSection.classList.remove('hidden');
+        }
+    },
+
+    updateStartButton() {
+        if (this.allShipsPlaced()) {
+            this.startBtn.classList.remove('grayed-out');
+            this.startBtn.disabled = false;
+        } else {
+            this.startBtn.classList.add('grayed-out');
+            this.startBtn.disabled = true;
+        }
+    },
+
+    startGame: function () {
+        if (!this.allShipsPlaced()) return;
+        this.state = 'playing';
+        this.render();
+    },
+
+    allShipsPlaced: function () {
+        return this.player1.gameBoard.activeShips.length === 3;
+    },
 
     setupPlayers: function () {
-        // for now, setup players w/ ships on their boards:
-        const player1 = new Player('me');
-        const player2 = new Player('computer');
-        this.currentTurn = player1;
+        this.player1 = new Player('me');
+        this.player2 = new Player('computer');
+        this.currentTurn = this.player1;
 
-        player1.gameBoard.placeShip([3, 0, 4, true]); // length, x, y, horizontal
-        player1.gameBoard.placeShip([4, 4, 2, false]);
-        player1.gameBoard.placeShip([2, 6, 2, true]);
-        player2.gameBoard.placeShip([3, 0, 4, true]);
-        player2.gameBoard.placeShip([4, 4, 2, false]);
-        player2.gameBoard.placeShip([2, 6, 2, true]);
+        this.player1.gameBoard.placeShip([3, 0, 4, true]); // length, x, y, horizontal
+        this.player1.gameBoard.placeShip([4, 4, 2, false]);
+        this.player1.gameBoard.placeShip([2, 6, 2, true]);
+        this.player2.gameBoard.placeShip([3, 0, 4, true]);
+        this.player2.gameBoard.placeShip([4, 4, 2, false]);
+        this.player2.gameBoard.placeShip([2, 6, 2, true]);
 
-        console.log(player1.gameBoard.getBoard());
+        this.updateStartButton();
+        console.log(this.player1.gameBoard.getBoard());
         this.whoseTurn.textContent = 'Your turn';
     },
 
@@ -209,10 +241,14 @@ export const gameApp = {
 
         // set up again
         this.cache();
-        this.setupPlayers();
+        this.setupPlayers(); 
         this.createGrids();
         this.bindGridEvents();
         this.updateGrid(this.player1);
         this.updateGrid(this.player2);
     },
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    gameApp.init();
+});
