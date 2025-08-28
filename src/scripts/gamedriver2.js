@@ -6,7 +6,7 @@ export const gameApp = {
     player1: null,
     player2: null,
 
-    // =============== Initialization and Setup ===============
+    // ============================================= Initialization and Setup =============================================
 
     init: function () {
         this.cache();
@@ -45,8 +45,9 @@ export const gameApp = {
         this.player2.gameBoard.placeShip([2, 6, 2, true]);
 
         this.updateStartButton();
-        console.log(this.player1.gameBoard.getBoard());
         this.whoseTurn.textContent = 'Your turn';
+        this.hitMessage.textContent =
+            "To start the game, click a square in the enemy's grid.";
     },
 
     createGrids: function () {
@@ -133,17 +134,18 @@ export const gameApp = {
         return this.player1.gameBoard.activeShips.length === 3;
     },
 
-    // =============== Gameplay ===============
+    // ============================================= Gameplay =============================================
 
     takeTurn: function () {
-        if (this.currentTurn === this.player2) {
-            this.whoseTurn.textContent = "Computer's turn";
-            this.computerMove();
-            this.currentTurn = this.player1;
-        } else {
-            // user turn
-            this.whoseTurn.textContent = 'Your turn';
+        if (this.currentTurn === this.player1) {
+            // Switch to computer's turn
             this.currentTurn = this.player2;
+            this.whoseTurn.textContent = "Enemy's turn";
+            this.computerMove();
+        } else {
+            // Switch to player's turn
+            this.currentTurn = this.player1;
+            this.whoseTurn.textContent = 'Your turn';
         }
     },
 
@@ -159,6 +161,7 @@ export const gameApp = {
                     this.updateGrid(this.player1);
                     attacked = true;
                     this.whoseTurn.textContent = 'Your turn';
+                    this.takeTurn();
                 } catch (error) {
                     // receiveAttack throws error if grid-piece was already attacked, so re-run in this case
                     continue;
@@ -167,7 +170,7 @@ export const gameApp = {
         }, 1500);
     },
 
-    // =============== Dynamic Display Based on Gameplay ===============
+    // ============================================= Dynamic Display Based on Gameplay =============================================
 
     // Put classes to display if cell is a ship, was hit, was a miss, or is untouched
     updateGrid(player) {
@@ -236,7 +239,7 @@ export const gameApp = {
         return 'empty';
     },
 
-    // =============== Reset Game ===============
+    // ============================================= Reset Game =============================================
 
     resetGame: function () {
         // reset everything
@@ -257,7 +260,7 @@ export const gameApp = {
     },
 };
 
-// =============== Initialize App ===============
+// ============================================= Initialize App =============================================
 
 document.addEventListener('DOMContentLoaded', () => {
     gameApp.init();
