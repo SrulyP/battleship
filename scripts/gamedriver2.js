@@ -83,8 +83,16 @@ export const gameApp = {
             '.grid-piece.computer'
         );
         gridSquares.forEach((square) => {
+            const x = Number(square.dataset.x);
+            const y = Number(square.dataset.y);
+            square.style.cursor = 'pointer';
+
             square.addEventListener('click', () => {
-                if (this.currentTurn === this.player1) {
+                if (
+                    this.currentTurn === this.player1 &&
+                    !this.player1.gameBoard.allShipsSunk() &&
+                    !this.player2.gameBoard.allShipsSunk()
+                ) {
                     const cords = [
                         Number(square.dataset.x),
                         Number(square.dataset.y),
