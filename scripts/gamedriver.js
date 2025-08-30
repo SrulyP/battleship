@@ -48,6 +48,7 @@ export const gameApp = {
 
     createGrids: function () {
         this.createGrid(this.playerGrid, this.player1);
+        this.createGrid(this.playerGridSetup, this.player1);
         this.createGrid(this.pcGrid, this.player2);
     },
 
