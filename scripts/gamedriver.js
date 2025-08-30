@@ -30,6 +30,7 @@ export const gameApp = {
         this.pcGrid = document.querySelector('.pc-grid');
         this.whoseTurn = document.querySelector('.whose-turn');
         this.hitMessage = document.querySelector('.hit-message');
+        this.shipsSection = document.querySelector('.ships');
     },
 
     setupPlayers: function () {
@@ -118,6 +119,20 @@ export const gameApp = {
 
     setupUserShips: function () {
         let shipLengths = [5, 4, 3, 3, 2];
+
+        // for each length in the list, create [length] segments of the ship
+        // and then add it to the ships section
+        for (let i = 0; i < shipLengths.length; i++) {
+            const ship = document.createElement('div');
+            ship.classList.add('ship-piece');
+            for (let j = 0; j < shipLengths[i]; j++) {
+                const shipSegment = document.createElement('div');
+                shipSegment.classList.add('ship-segment');
+                ship.appendChild(shipSegment);
+            }
+            this.shipsSection.appendChild(ship);
+        }
+
         this.updateStartButton();
     },
 
@@ -137,7 +152,6 @@ export const gameApp = {
 
                     // try to place the ship on the board
                     this.player2.gameBoard.placeShip(cords);
-                    const ship = this.player2.gameBoard.placeShip(cords);
                     shipPlaced = true;
                 } catch {
                     continue;
