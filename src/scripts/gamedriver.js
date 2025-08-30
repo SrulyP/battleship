@@ -128,11 +128,16 @@ export const gameApp = {
         });
     },
 
-    dragOver: function (e) {
-        e.preventDefault();
-        // clear previous highlights and show new ones
-        this.clearHighlights();
-        this.highlightShipPlacement(e.target);
+    bindShipDrag: function (ship) {
+        ship.addEventListener('dragstart', (e) => this.dragStart(e));
+        ship.addEventListener('dragend', (e) => this.dragEnd(e));
+    },
+
+    dragStart: function (e) {
+        this.beingDragged = e.target;
+        e.target.style.opacity = '0.5';
+        this.errorMessages.textContent =
+            'Drag your ships onto your board, then click start game';
     },
 
     dragEnter: function (e) {
@@ -140,9 +145,49 @@ export const gameApp = {
         this.highlightShipPlacement(e.target);
     },
 
+    dragOver: function (e) {
+        e.preventDefault();
+        // clear previous highlights and show new ones
+        this.clearHighlights();
+        this.highlightShipPlacement(e.target);
+    },
+
     dragLeave: function (e) {
         e.preventDefault();
         this.clearHighlights();
+    },
+
+    dragDrop: function (e) {
+        e.preventDefault();
+        this.clearHighlights();
+
+        const x = Number(e.target.dataset.x);
+        const y = Number(e.target.dataset.y);
+        const shipLength = this.beingDragged.children.length;
+        try {
+            // try to place the ship on the player's board
+            const cords = [shipLength, x, y, this.horizontal]; // [length, x, y, horizontal]
+            this.player1.gameBoard.placeShip(cords);
+
+            // remove the ship from the ships section
+            this.beingDragged.style.display = 'none';
+            this.beingDragged = null;
+
+            // update the grid and start button
+            this.updateGrid(this.player1);
+            this.updateStartButton();
+        } catch (error) {
+            // if there is an error during placement, say why
+            this.errorMessages.textContent = error.message;
+        }
+    },
+
+    dragEnd: function (e) {
+        e.target.style.opacity = '1';
+        const highlights = document.querySelectorAll('.highlight');
+        highlights.forEach((highlight) =>
+            highlight.classList.remove('highlight')
+        );
     },
 
     highlightShipPlacement: function (targetSquare) {
@@ -172,31 +217,6 @@ export const gameApp = {
         highlights.forEach((square) => {
             square.classList.remove('highlight');
         });
-    },
-
-    dragDrop: function (e) {
-        e.preventDefault();
-        this.clearHighlights();
-
-        const x = Number(e.target.dataset.x);
-        const y = Number(e.target.dataset.y);
-        const shipLength = this.beingDragged.children.length;
-        try {
-            // try to place the ship on the player's board
-            const cords = [shipLength, x, y, this.horizontal]; // [length, x, y, horizontal]
-            this.player1.gameBoard.placeShip(cords);
-
-            // remove the ship from the ships section
-            this.beingDragged.style.display = 'none';
-            this.beingDragged = null;
-
-            // update the grid and start button
-            this.updateGrid(this.player1);
-            this.updateStartButton();
-        } catch (error) {
-            // if there is an error during placement, say why
-            this.errorMessages.textContent = error.message;
-        }
     },
 
     toggleHorizontal: function () {
@@ -245,26 +265,6 @@ export const gameApp = {
         }
 
         this.updateStartButton();
-    },
-
-    bindShipDrag: function (ship) {
-        ship.addEventListener('dragstart', (e) => this.dragStart(e));
-        ship.addEventListener('dragend', (e) => this.dragEnd(e));
-    },
-
-    dragStart: function (e) {
-        this.beingDragged = e.target;
-        e.target.style.opacity = '0.5';
-        this.errorMessages.textContent =
-            'Drag your ships onto your board, then click start game';
-    },
-
-    dragEnd: function (e) {
-        e.target.style.opacity = '1';
-        const highlights = document.querySelectorAll('.highlight');
-        highlights.forEach((highlight) =>
-            highlight.classList.remove('highlight')
-        );
     },
 
     setupComputerShips: function () {
