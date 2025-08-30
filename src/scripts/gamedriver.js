@@ -5,7 +5,7 @@ export const gameApp = {
     currentTurn: null,
     player1: null,
     player2: null,
-    beingDragged: null,
+    beingDragged: null, // the ship object being dragged, using in
     horizontal: true,
 
     // ============================================= Initialization and Setup =============================================
@@ -258,6 +258,7 @@ export const gameApp = {
         if (!this.allShipsPlaced()) return;
         this.state = 'playing';
         this.render();
+        this.updateGrid(this.player1);
     },
 
     allShipsPlaced: function () {
