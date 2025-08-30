@@ -141,6 +141,10 @@ h3 {
   box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.15);
 }
 
+.hit-message {
+  opacity: 0.75;
+}
+
 .board-container {
   display: flex;
   gap: 30px;
@@ -198,15 +202,15 @@ h3 {
 .ship-piece {
   display: flex;
   flex-direction: row;
-  gap: 2px;
+  gap: 3px;
   width: fit-content;
   background-color: transparent;
   border: none;
 }
 
 .ship-segment {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
 }
 
 /* ==================================== Footer ==================================== */
@@ -218,7 +222,7 @@ footer {
   font-weight: 500;
 }
 
-/* ==================================== Hidden ==================================== */
+/* ==================================== Utility ==================================== */
 
 .hidden {
   display: none;
