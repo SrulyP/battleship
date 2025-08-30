@@ -265,6 +265,8 @@ export const gameApp = {
 
     startGame: function () {
         if (!this.allShipsPlaced()) return;
+        this.hitMessage.textContent =
+            "To start the game, click a square in the enemy's grid.";
         this.state = 'playing';
         this.render();
         this.updateGrid(this.player1);
@@ -440,6 +442,7 @@ export const gameApp = {
         this.player1 = null;
         this.player2 = null;
         this.beingDragged = null;
+        this.horizontal = true;
         if (this.hitMessage) this.hitMessage.textContent = '';
         if (this.whoseTurn) this.whoseTurn.textContent = '';
 
