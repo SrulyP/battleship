@@ -37,14 +37,9 @@ export const gameApp = {
         this.player2 = new Player('computer');
         this.currentTurn = this.player1;
 
-        this.player1.gameBoard.placeShip([3, 0, 4, true]); // length, x, y, horizontal
-        this.player1.gameBoard.placeShip([4, 4, 2, false]);
-        this.player1.gameBoard.placeShip([2, 6, 2, true]);
-        this.player2.gameBoard.placeShip([3, 0, 4, true]);
-        this.player2.gameBoard.placeShip([4, 4, 2, false]);
-        this.player2.gameBoard.placeShip([2, 6, 2, true]);
+        this.setupUserShips();
+        this.setupComputerShips();
 
-        this.updateStartButton();
         this.whoseTurn.textContent = 'Your turn';
         this.hitMessage.textContent =
             "To start the game, click a square in the enemy's grid.";
@@ -88,6 +83,7 @@ export const gameApp = {
             square.style.cursor = 'pointer';
 
             square.addEventListener('click', () => {
+                // if the game isn't over: take the cords and attack enemy ship
                 if (
                     this.currentTurn === this.player1 &&
                     !this.player1.gameBoard.allShipsSunk() &&
@@ -120,6 +116,36 @@ export const gameApp = {
         }
     },
 
+    setupUserShips: function () {
+        let shipLengths = [5, 4, 3, 3, 2];
+        this.updateStartButton();
+    },
+
+    setupComputerShips: function () {
+        let shipLengths = [5, 4, 3, 3, 2];
+
+        for (let i = 0; i < shipLengths.length; i++) {
+            const length = shipLengths[i];
+            let shipPlaced = false;
+            while (!shipPlaced) {
+                try {
+                    // get the cords and horizontal-ness
+                    const x = Math.floor(Math.random() * 10);
+                    const y = Math.floor(Math.random() * 10);
+                    const horizontal = Math.random() < 0.5;
+                    const cords = [length, x, y, horizontal];
+
+                    // try to place the ship on the board
+                    this.player2.gameBoard.placeShip(cords);
+                    const ship = this.player2.gameBoard.placeShip(cords);
+                    shipPlaced = true;
+                } catch {
+                    continue;
+                }
+            }
+        }
+    },
+
     updateStartButton() {
         if (this.allShipsPlaced()) {
             this.startBtn.classList.remove('grayed-out');
@@ -137,7 +163,7 @@ export const gameApp = {
     },
 
     allShipsPlaced: function () {
-        return this.player1.gameBoard.activeShips.length === 3;
+        return this.player1.gameBoard.activeShips.length === 5;
     },
 
     // ============================================= Gameplay =============================================
