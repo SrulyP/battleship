@@ -34,6 +34,7 @@ export const gameApp = {
         this.whoseTurn = document.querySelector('.whose-turn');
         this.hitMessage = document.querySelector('.hit-message');
         this.shipsSection = document.querySelector('.ships');
+        this.errorMessages = document.querySelector('.error-messages');
     },
 
     setupPlayers: function () {
@@ -47,6 +48,8 @@ export const gameApp = {
         this.whoseTurn.textContent = 'Your turn';
         this.hitMessage.textContent =
             "To start the game, click a square in the enemy's grid.";
+        this.errorMessages.textContent =
+            'Drag your ships onto your board, then click start game';
     },
 
     createGrids: function () {
@@ -125,22 +128,55 @@ export const gameApp = {
         });
     },
 
-    dragEnter: function (e) {
-        e.preventDefault();
-        e.target.classList.add('highlight');
-    },
-
     dragOver: function (e) {
         e.preventDefault();
+        // clear previous highlights and show new ones
+        this.clearHighlights();
+        this.highlightShipPlacement(e.target);
+    },
+
+    dragEnter: function (e) {
+        e.preventDefault();
+        this.highlightShipPlacement(e.target);
     },
 
     dragLeave: function (e) {
-        e.target.classList.remove('highlight');
+        e.preventDefault();
+        this.clearHighlights();
+    },
+
+    highlightShipPlacement: function (targetSquare) {
+        const shipLength = this.beingDragged.children.length;
+        const startingX = Number(targetSquare.dataset.x);
+        const startingY = Number(targetSquare.dataset.y);
+
+        // show where the ship would be placed
+        for (let i = 0; i < shipLength; i++) {
+            let x = this.horizontal ? startingX + i : startingX;
+            let y = this.horizontal ? startingY : startingY + i;
+
+            // find the square with these exact coordinates
+            const square = this.playerGridSetup.querySelector(
+                `.grid-piece[data-x="${x}"][data-y="${y}"]`
+            );
+
+            // if the square exists (not out of bounds), highlight it
+            if (square) {
+                square.classList.add('highlight');
+            }
+        }
+    },
+
+    clearHighlights: function () {
+        const highlights = this.playerGridSetup.querySelectorAll('.highlight');
+        highlights.forEach((square) => {
+            square.classList.remove('highlight');
+        });
     },
 
     dragDrop: function (e) {
         e.preventDefault();
-        e.target.classList.remove('highlight');
+        this.clearHighlights();
 
         const x = Number(e.target.dataset.x);
         const y = Number(e.target.dataset.y);
@@ -159,7 +195,7 @@ export const gameApp = {
             this.updateStartButton();
         } catch (error) {
             // if there is an error during placement, say why
-            this.hitMessage.textContent = error.message;
+            this.errorMessages.textContent = error.message;
         }
     },
 
@@ -219,6 +255,8 @@ export const gameApp = {
     dragStart: function (e) {
         this.beingDragged = e.target;
         e.target.style.opacity = '0.5';
+        this.errorMessages.textContent =
+            'Drag your ships onto your board, then click start game';
     },
 
     dragEnd: function (e) {
@@ -445,6 +483,7 @@ export const gameApp = {
         this.horizontal = true;
         if (this.hitMessage) this.hitMessage.textContent = '';
         if (this.whoseTurn) this.whoseTurn.textContent = '';
+        if (this.errorMessages) this.errorMessages.textContent = '';
 
         // set up again
         this.cache();
