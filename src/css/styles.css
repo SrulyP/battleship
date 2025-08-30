@@ -104,7 +104,7 @@ h3 {
   pointer-events: none;
 }
 
-/* ------------- Setup layout & ships tray ------------- */
+/* ------------- Setup Layout and Ships Tray ------------- */
 
 .player-grid-setup-section {
   display: grid;
@@ -173,7 +173,7 @@ h3 {
   align-items: center;
 }
 
-/* ------------- Attacked Pieces ------------- */
+/* ------------- Modified Pieces and Ship Pieces ------------- */
 
 .grid-piece.hit {
   background-color: var(--red);
@@ -205,14 +205,8 @@ h3 {
 }
 
 .ship-segment {
-  width: 32px;
-  height: 32px;
-}
-
-/* ==================================== Hidden ==================================== */
-
-.hidden {
-  display: none;
+  width: 36px;
+  height: 36px;
 }
 
 /* ==================================== Footer ==================================== */
@@ -222,4 +216,10 @@ footer {
   background-color: var(--dark-blue);
   color: var(--white-green);
   font-weight: 500;
+}
+
+/* ==================================== Hidden ==================================== */
+
+.hidden {
+  display: none;
 }
