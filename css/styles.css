@@ -153,7 +153,8 @@ h3 {
   box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.15);
 }
 
-.hit-message {
+.hit-message,
+.error-messages {
   opacity: 0.75;
 }
 
@@ -246,4 +247,9 @@ footer {
 
 .hidden {
   display: none;
+}
+
+.grid-piece.highlight {
+  background-color: rgba(70, 117, 153, 0.7) !important;
+  border: 2px solid var(--medium-blue) !important;
 }
