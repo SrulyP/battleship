@@ -5,6 +5,8 @@ export const gameApp = {
     currentTurn: null,
     player1: null,
     player2: null,
+    beingDragged: null,
+    horizontal: true,
 
     // ============================================= Initialization and Setup =============================================
 
@@ -23,6 +25,7 @@ export const gameApp = {
     cache: function () {
         this.setupSection = document.querySelector('.setup');
         this.playingSection = document.querySelector('.playing');
+        this.rotateBtn = document.querySelector('.rotate-btn');
         this.startBtn = document.querySelector('.start-game');
         this.resetBtn = document.querySelector('.reset');
         this.playerGrid = document.querySelector('.player-grid');
@@ -70,12 +73,14 @@ export const gameApp = {
         // Bind button events
         this.startBtn.addEventListener('click', () => this.startGame());
         this.resetBtn.addEventListener('click', () => this.resetGame());
+        this.rotateBtn.addEventListener('click', () => this.toggleHorizontal());
 
         // Bind grid events
-        this.bindGridEvents();
+        this.bindPCGridEvents();
+        this.bindSetupEvents();
     },
 
-    bindGridEvents() {
+    bindPCGridEvents() {
         const gridSquares = this.pcGrid.querySelectorAll(
             '.grid-piece.computer'
         );
@@ -108,6 +113,60 @@ export const gameApp = {
         });
     },
 
+    bindSetupEvents: function () {
+        // bind events to the setup grid (where ships are dragged and dropped)
+        const gridSquares =
+            this.playerGridSetup.querySelectorAll('.grid-piece.me');
+        gridSquares.forEach((square) => {
+            square.addEventListener('dragover', (e) => this.dragOver(e));
+            square.addEventListener('dragenter', (e) => this.dragEnter(e));
+            square.addEventListener('dragleave', (e) => this.dragLeave(e));
+            square.addEventListener('drop', (e) => this.dragDrop(e));
+        });
+    },
+
+    dragEnter: function (e) {
+        e.preventDefault();
+        e.target.classList.add('highlight');
+    },
+
+    dragOver: function (e) {
+        e.preventDefault();
+    },
+
+    dragLeave: function (e) {
+        e.target.classList.remove('highlight');
+    },
+
+    dragDrop: function (e) {
+        e.preventDefault();
+        e.target.classList.remove('highlight');
+
+        const x = Number(e.target.dataset.x);
+        const y = Number(e.target.dataset.y);
+        const shipLength = this.beingDragged.children.length;
+        try {
+            // try to place the ship on the player's board
+            const cords = [shipLength, x, y, this.horizontal]; // [length, x, y, horizontal]
+            this.player1.gameBoard.placeShip(cords);
+
+            // remove the ship from the ships section
+            this.beingDragged.style.display = 'none';
+            this.beingDragged = null;
+
+            // update the grid and start button
+            this.updateGrid(this.player1);
+            this.updateStartButton();
+        } catch (error) {
+            // if there is an error during placement, say why
+            this.hitMessage.textContent = error.message;
+        }
+    },
+
+    toggleHorizontal: function () {
+        this.horizontal = !this.horizontal;
+    },
+
     render: function () {
         if (this.state === 'setup') {
             this.setupSection.classList.remove('hidden');
@@ -120,21 +179,45 @@ export const gameApp = {
 
     setupUserShips: function () {
         let shipLengths = [5, 4, 3, 3, 2];
+        // clear existing ships
+        this.shipsSection.innerHTML = '';
 
         // for each length in the list, create [length] segments of the ship
         // and then add it to the ships section
         for (let i = 0; i < shipLengths.length; i++) {
             const ship = document.createElement('div');
             ship.classList.add('ship-piece');
+            ship.setAttribute('draggable', true);
+
             for (let j = 0; j < shipLengths[i]; j++) {
                 const shipSegment = document.createElement('div');
                 shipSegment.classList.add('ship-segment');
                 ship.appendChild(shipSegment);
             }
+
+            this.bindShipDrag(ship);
             this.shipsSection.appendChild(ship);
         }
 
         this.updateStartButton();
+    },
+
+    bindShipDrag: function (ship) {
+        ship.addEventListener('dragstart', (e) => this.dragStart(e));
+        ship.addEventListener('dragend', (e) => this.dragEnd(e));
+    },
+
+    dragStart: function (e) {
+        this.beingDragged = e.target;
+        e.target.style.opacity = '0.5';
+    },
+
+    dragEnd: function (e) {
+        e.target.style.opacity = '1';
+        const highlights = document.querySelectorAll('.highlight');
+        highlights.forEach((highlight) =>
+            highlight.classList.remove('highlight')
+        );
     },
 
     setupComputerShips: function () {
@@ -228,10 +311,13 @@ export const gameApp = {
     updateGrid(player) {
         let grid = null;
         if (player === this.player1) {
-            grid = this.playerGrid;
+            // during setup, update the setup grid and during play, update the player grid
+            grid =
+                this.state === 'setup' ? this.playerGridSetup : this.playerGrid;
         } else {
             grid = this.pcGrid;
         }
+
         // get all squares (pc's or player's)
         const squares = grid.querySelectorAll(`.grid-piece.${player.name}`);
 
@@ -343,6 +429,7 @@ export const gameApp = {
         this.currentTurn = null;
         this.player1 = null;
         this.player2 = null;
+        this.beingDragged = null;
         if (this.hitMessage) this.hitMessage.textContent = '';
         if (this.whoseTurn) this.whoseTurn.textContent = '';
 
@@ -350,7 +437,8 @@ export const gameApp = {
         this.cache();
         this.setupPlayers();
         this.createGrids();
-        this.bindGridEvents();
+        this.bindPCGridEvents();
+        this.bindSetupEvents();
         this.updateGrid(this.player1);
         this.updateGrid(this.player2);
         this.render();
