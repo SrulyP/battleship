@@ -165,6 +165,15 @@ export const gameApp = {
 
     toggleHorizontal: function () {
         this.horizontal = !this.horizontal;
+
+        const ships = this.shipsSection.querySelectorAll('.ship-piece');
+        ships.forEach((ship) => {
+            if (this.horizontal) {
+                ship.classList.remove('vertical');
+            } else {
+                ship.classList.add('vertical');
+            }
+        });
     },
 
     render: function () {
